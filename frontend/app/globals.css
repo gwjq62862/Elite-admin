@@ -1,0 +1,30 @@
+/* app/globals.css (Updated) */
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors (New colors added: surface, muted, border) */
+  --color-primary: #ec1313;
+  --color-background-light: #f8f6f6;
+  --color-background-dark: #181111; /* Updated */
+  --color-surface-dark: #221010;    /* New */
+  --color-surface-light: #FFFFFF;  /* New */
+  --color-muted-dark: #b99d9d;      /* New */
+  --color-muted-light: #525252;    /* New */
+  --color-border-dark: #543b3b;    /* New */
+  --color-border-light: #E5E7EB;   /* New */
+  
+  --font-display: "Inter", "sans-serif";
+}
+
+/* Background/Foreground CSS Variables (optional for full dark mode support) */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
