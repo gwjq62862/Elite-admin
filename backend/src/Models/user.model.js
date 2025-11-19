@@ -6,7 +6,12 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   imageUrl: String,
-
+  role:{
+    required:true,
+    type:String,
+    enum:["user",'admin'],
+    default:"user",
+  }
 },{timestamps:true})
 
 export const User = mongoose.model('User', userSchema)
