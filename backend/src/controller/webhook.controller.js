@@ -18,9 +18,9 @@ async function validateRequest(request) {
 
 
 export const handleClerkWebhook = async (req, res) => {
-  validateRequest(payload)
-  const payload = await req.json()
  
+  const payload = await req.json()
+  validateRequest(payload)
   
   const { type, data } = payload
 
