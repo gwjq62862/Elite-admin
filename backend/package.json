@@ -17,6 +17,7 @@
     "@clerk/express": "^1.7.50",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "mongoose": "^8.20.0"
+    "mongoose": "^8.20.0",
+    "svix": "^1.81.0"
   }
 }
