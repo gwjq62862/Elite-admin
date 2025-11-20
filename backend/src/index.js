@@ -5,7 +5,9 @@ import { connectDB } from './config/db.js'
 import userRouter from'./route/user.route.js'
 const app=express()
 const PORT=ENV.PORT
-
+app.use('/ping',(req,res)=>{
+    res.status(200).json({message:"your server is wake up"})
+})
 app.use(clerkMiddleware())
 app.use('/api/user',userRouter)
 
