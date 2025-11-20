@@ -1,59 +1,75 @@
-import { ENV } from "../config/env.js"
-import { User } from "../Models/user.model.js"
 import { Webhook } from 'svix'
+import { ENV } from "../config/env.js" 
+import { User } from "../Models/user.model.js" 
+
 
 const webhookSecret = ENV.webhookSecret
 
-async function validateRequest(request) {
-  const payloadString = await request.text()
-  const headerPayload = headers()
-  const svixHeaders = {
-    'svix-id': headerPayload.get('svix-id'),
-    'svix-timestamp': headerPayload.get('svix-timestamp'),
-    'svix-signature': headerPayload.get('svix-signature'),
-  }
-  const wh = new Webhook(webhookSecret)
-  return wh.verify(payloadString, svixHeaders)
-}
-
-
 export const handleClerkWebhook = async (req, res) => {
- 
-  const payload = await req.json()
-  validateRequest(payload)
+
+    const rawBody = req.rawBody; 
+
+    if (!rawBody) {
+        console.error("Webhook processing failed: Raw body is missing. Check your index.js setup.");
+        return res.status(400).send('Raw Body is Missing for Svix Verification');
+    }
+
   
-  const { type, data } = payload
+    const svixHeaders = {
+        'svix-id': req.headers['svix-id'], 
+        'svix-timestamp': req.headers['svix-timestamp'],
+        'svix-signature': req.headers['svix-signature'],
+    };
 
-  try {
-    if (type === 'user.created') {
-      await User.create({
-        clerkId: data.id,
-        email: data.email_addresses[0]?.email_address,
-        firstName: data.first_name,
-        lastName: data.last_name,
-        imageUrl: data.image_url
-      })
+    let event;
+    
+
+    try {
+        const wh = new Webhook(webhookSecret);
+     
+        event = wh.verify(rawBody, svixHeaders); 
+    } catch (err) {
+        console.error('Error verifying webhook signature:', err.message);
+        return res.status(400).send('Webhook Signature Verification Failed');
     }
 
-    if (type === 'user.updated') {
-      await User.findOneAndUpdate(
-        { clerkId: data.id },
-        {
-          email: data.email_addresses[0]?.email_address,
-          firstName: data.first_name,
-          lastName: data.last_name,
-          imageUrl: data.image_url
+   
+    const { type, data } = event; 
+
+    try {
+        // --- Database Logic ---
+        if (type === 'user.created') {
+            await User.create({
+                clerkId: data.id,
+                email: data.email_addresses[0]?.email_address,
+                firstName: data.first_name,
+                lastName: data.last_name,
+                imageUrl: data.image_url
+            })
         }
-      )
-    }
 
-    if (type === 'user.deleted') {
-      await User.findOneAndDelete({ clerkId: data.id })
-    }
+        if (type === 'user.updated') {
+            await User.findOneAndUpdate(
+                { clerkId: data.id },
+                {
+                    email: data.email_addresses[0]?.email_address,
+                    firstName: data.first_name,
+                    lastName: data.last_name,
+                    imageUrl: data.image_url
+                },
+                { new: true } 
+            )
+        }
 
-    res.status(200).json({ success: true })
-  } catch (error) {
-    console.error('Webhook error:', error)
-    res.status(500).json({ error: 'Webhook processing failed' })
-  }
+        if (type === 'user.deleted') {
+            await User.findOneAndDelete({ clerkId: data.id })
+        }
+
+       
+        res.status(200).json({ success: true, message: 'Webhook received and processed' })
+    } catch (error) {
+        console.error('Database Webhook processing failed:', error)
+      
+        res.status(500).json({ error: 'Database processing failed' })
+    }
 }

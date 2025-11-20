@@ -1,16 +1,10 @@
 import express from'express'
 import { createUser } from '../controller/user.controller.js'
-import { handleClerkWebhook } from '../controller/webhook.controller.js'
-
-const router=express.Router()
 
 
+const router = express.Router()
 
 
-
-
-router.post('/webhooks/clerk', handleClerkWebhook)
-
-
+router.post('/', createUser) 
 
 export default router
