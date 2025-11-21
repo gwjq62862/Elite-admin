@@ -16,7 +16,21 @@ app.use('/ping', (req, res) => {
     res.status(200).json({ message: "your server is wake up" })
 })
 
+const allowedOrigins = [
+    'http://localhost:3000', 
+    'https://[သင့်-frontend-domain].com' /
 
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
 
 app.post('/api/webhooks/clerk', 
     // express.raw 

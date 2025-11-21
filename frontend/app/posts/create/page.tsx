@@ -138,7 +138,7 @@ export default function CreatePostPage() {
 
         try {
            
-            const response = await fetch(' https://elite-admin-71bb.onrender.com/api/posts/', {
+            const response = await fetch('https://elite-admin-71bb.onrender.com/api/posts/', {
                 method: 'POST',
               
                 body: dataToSend,
