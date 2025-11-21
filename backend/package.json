@@ -15,6 +15,7 @@
   "packageManager": "pnpm@10.18.3",
   "dependencies": {
     "@clerk/express": "^1.7.50",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "imagekit": "^6.0.0",

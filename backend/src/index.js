@@ -2,7 +2,7 @@ import express from 'express'
 import { ENV } from './config/env.js'
 import { clerkMiddleware } from '@clerk/express'
 import { connectDB } from './config/db.js'
-
+import cors from 'cors'
 import userRouter from './route/user.route.js' 
 import { handleClerkWebhook } from './controller/webhook.controller.js'
 
