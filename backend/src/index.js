@@ -18,19 +18,26 @@ app.use('/ping', (req, res) => {
 
 const allowedOrigins = [
     'http://localhost:3000', 
-    'https://[သင့်-frontend-domain].com' /
+
+    'https://your-frontend-domain.com' 
+]; 
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
+   
+    origin: function (origin, callback) {
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`Not allowed by CORS for origin: ${origin}`));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    credentials: true, 
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); 
+
 
 app.post('/api/webhooks/clerk', 
     // express.raw 
