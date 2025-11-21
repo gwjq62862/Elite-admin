@@ -6,7 +6,7 @@ import { connectDB } from './config/db.js'
 import userRouter from './route/user.route.js' 
 import { handleClerkWebhook } from './controller/webhook.controller.js'
 
-
+import postRouter from './route/post.route.js'
 
 const app = express()
 const PORT = ENV.PORT
@@ -31,12 +31,12 @@ app.post('/api/webhooks/clerk',
 
 
 app.use(express.json())
-
+app.use(express.urlencoded({ extended: true }));
 
 app.use(clerkMiddleware()) 
 
-
-app.use('/api/user', userRouter)
+app.use('/api/posts',postRouter)
+// app.use('/api/user', userRouter)
 
 app.listen(PORT, () => {
     connectDB()
