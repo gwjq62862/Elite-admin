@@ -87,3 +87,62 @@ export const CreatePost = async (req, res) => {
         });
     }
 }
+
+export const GetAllPosts = async (req, res) => {
+    try {
+       
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit; 
+
+        
+        let sortQuery = { createdAt: -1 };
+        if (req.query.sort) {
+        
+            try {
+                sortQuery = JSON.parse(req.query.sort);
+            } catch (e) {
+                console.warn("Invalid sort JSON provided, falling back to default sort.");
+            }
+        }
+
+       
+        const totalPosts = await FreeCourse.countDocuments(); 
+
+     
+        const posts = await FreeCourse.find()
+            .sort(sortQuery)
+            .skip(skip)
+            .limit(limit)
+            .select('-__v'); 
+
+     
+        const totalPages = Math.ceil(totalPosts / limit);
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
+
+        
+        return res.status(200).json({
+            success: true,
+            message: "Posts fetched successfully with pagination.",
+            data: posts,
+            metadata: {
+                totalPosts,
+                totalPages,
+                currentPage: page,
+                limit: limit,
+                hasNextPage,
+                hasPrevPage,
+                nextPage: hasNextPage ? page + 1 : null,
+                prevPage: hasPrevPage ? page - 1 : null,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching free course posts:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error while fetching posts." 
+        });
+    }
+}
