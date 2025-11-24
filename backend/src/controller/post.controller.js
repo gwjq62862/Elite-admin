@@ -168,6 +168,70 @@ export const GetAllPosts = async (req, res) => {
 }
 
 /**
+ * @description Fetches a single post by ID
+ * @route GET /api/posts/:id
+ * @access Public
+ * @complexity O(1) - Indexed lookup by _id, single document retrieval.
+ */
+export const GetPostById = async (req, res) => {
+    const postId = req.params.id;
+
+    console.log('GetPostById called with ID:', postId);
+
+    // Validate Post ID format (MongoDB ObjectId is 24 hex characters)
+    if (!postId) {
+        return res.status(400).json({
+            success: false,
+            message: "Post ID is required."
+        });
+    }
+
+    // MongoDB ObjectId validation - must be exactly 24 hex characters
+    if (!postId.match(/^[0-9a-fA-F]{24}$/)) {
+        console.log('Invalid post ID format:', postId);
+        return res.status(400).json({
+            success: false,
+            message: "Invalid post ID format. Expected 24-character MongoDB ObjectId."
+        });
+    }
+
+    try {
+        // Find post by ID - O(1) with indexed _id
+        const post = await FreeCourse.findById(postId).select('-__v');
+
+        if (!post) {
+            console.log('Post not found in database:', postId);
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
+
+        console.log('Post found successfully:', postId);
+        return res.status(200).json({
+            success: true,
+            message: "Post fetched successfully",
+            data: post
+        });
+
+    } catch (error) {
+        console.error('Error fetching post:', error);
+
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid post ID format."
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error while fetching post."
+        });
+    }
+}
+
+/**
  * @description Updates an existing free course post (Requires Admin Role)
  * @route PUT /api/posts/:id
  * @access Private (via requireAuth() middleware)
